@@ -1,7 +1,7 @@
 <?php
-// adopt_request.php
 session_start();
-require_once 'config.php';
+include 'config.php';
+require_once 'notify.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: homepage.php");
@@ -59,12 +59,16 @@ if ($exists) {
 }
 
 // Save request + gawing Pending ang pet
+$saved     = false;
+$requestId = 0;
+
 try {
     $conn->begin_transaction();
 
     $ins = $conn->prepare("INSERT INTO adoption_requests (pet_id, user_id) VALUES (?, ?)");
     $ins->bind_param("ii", $petId, $userId);
     $ins->execute();
+    $requestId = (int)$ins->insert_id;
     $ins->close();
 
     $upd = $conn->prepare("UPDATE pets SET status = 'Pending' WHERE id = ? AND status = 'Available'");
@@ -73,10 +77,62 @@ try {
     $upd->close();
 
     $conn->commit();
+    $saved = true;
     $_SESSION['adopt_msg'] = 'Your adoption request was sent! Please wait for the admin to contact you.';
 } catch (Throwable $e) {
     $conn->rollback();
     $_SESSION['adopt_msg'] = 'Something went wrong. Please try again.';
+}
+
+// Notifications (hindi sisirain ang adoption kung pumalya)
+if ($saved) {
+    $petFull = null;
+    $user    = null;
+
+    try {
+        $p = $conn->prepare("SELECT * FROM pets WHERE id = ?");
+        $p->bind_param("i", $petId);
+        $p->execute();
+        $petFull = $p->get_result()->fetch_assoc();
+        $p->close();
+
+        $u = $conn->prepare("SELECT fullname, email FROM users WHERE id = ?");
+        $u->bind_param("i", $userId);
+        $u->execute();
+        $user = $u->get_result()->fetch_assoc();
+        $u->close();
+    } catch (Throwable $e) {
+        error_log('Notify lookup error: ' . $e->getMessage());
+    }
+
+    if ($petFull && $user) {
+
+        // 1) Notification sa admin dashboard (naka-link sa request)
+        try {
+            $nTitle = 'New Adoption Request: ' . $petFull['pet_name'];
+            $nMsg   = $user['fullname'] . ' (' . $user['email'] . ') wants to adopt '
+                    . $petFull['pet_name'] . ' (' . $petFull['pet_species'] . ', ' . $petFull['breed'] . ').';
+            $nAud   = 'admin';
+
+            $n = $conn->prepare("INSERT INTO notifications (title, message, audience, request_id) VALUES (?, ?, ?, ?)");
+            $n->bind_param("sssi", $nTitle, $nMsg, $nAud, $requestId);
+            $n->execute();
+            $n->close();
+        } catch (Throwable $e) {
+            error_log('DASHBOARD NOTIF ERROR: ' . $e->getMessage());
+        }
+
+        // 2) Email sa admin
+        try {
+            if (!sendAdoptionNotification($petFull, $user['fullname'], $user['email'])) {
+                error_log('Adoption email failed for pet ' . $petId);
+            }
+        } catch (Throwable $e) {
+            error_log('EMAIL ERROR: ' . $e->getMessage());
+        }
+    } else {
+        error_log('Notify skipped: pet or user not found');
+    }
 }
 
 header("Location: $back");

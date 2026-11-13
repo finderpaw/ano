@@ -69,7 +69,7 @@ $sched_total  = count_rows($conn, "SELECT COUNT(*) FROM schedules");
 $rescue_total = count_rows($conn, "SELECT COUNT(*) FROM rescue_reports");
 $members      = count_rows($conn, "SELECT COUNT(*) FROM registered");
 
-/* schedules per month, last 6 months (skipped quietly if event_date isn't a date) */
+/* schedules per month, last 6 months */
 $months = [];
 for ($i = 5; $i >= 0; $i--) {
     $key = date('Y-m', strtotime("-$i month", strtotime(date('Y-m-01'))));
@@ -116,7 +116,8 @@ $admin_name = htmlspecialchars($_SESSION['username'] ?? 'Admin');
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 Overview
             </a>
-            <a href="pets.php">
+            <!-- Updated from pets.php to adopt.php based on your files -->
+            <a href="adopt.php">
                 <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>
                 Pets
             </a>
@@ -124,7 +125,8 @@ $admin_name = htmlspecialchars($_SESSION['username'] ?? 'Admin');
                 <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.4c2 .7 3.5 2.500 3.5 5.600"/></svg>
                 Users
             </a>
-            <a href="notifications.php">
+            <!-- Updated from notifications.php to notification.php -->
+            <a href="notification.php">
                 <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.300 21a1.900 1.900 0 0 0 3.400 0"/></svg>
                 Notifications
             </a>
@@ -305,7 +307,7 @@ $admin_name = htmlspecialchars($_SESSION['username'] ?? 'Admin');
             </div>
         </section>
 
-        <!-- STRAYS -->
+        <!-- STRAYS / RESCUE REPORTS -->
         <section class="panel" data-section>
             <div class="panel-head">
                 <h2>Missing &amp; Found Stray Pets (Reported Outside)</h2>
@@ -317,17 +319,24 @@ $admin_name = htmlspecialchars($_SESSION['username'] ?? 'Admin');
             <div class="slider-wrap">
                 <button class="arrow" data-dir="-1" aria-label="Scroll left">‹</button>
                 <div class="slider">
-                    <article class="pet" data-item>
-                        <img src="https://placehold.co/220x140/f1f5f9/0b5a6b?text=Stray+Photo" alt="Missing pet">
-                        <h3>------------</h3>
-                        <p class="muted">------------</p>
-                        <p class="tag">Barangay: ------------</p>
-                        <a class="btn btn-soft" href="pet_details.html">View details</a>
-                        <div class="row-actions">
-                            <button class="mini" style="border:0;cursor:pointer">Edit</button>
-                            <button class="mini danger" style="border:0;cursor:pointer">Delete</button>
-                        </div>
-                    </article>
+                    <?php
+                    $result_strays = @mysqli_query($conn, "SELECT * FROM rescue_reports ORDER BY id DESC");
+                    if ($result_strays && mysqli_num_rows($result_strays) > 0):
+                        while ($row = mysqli_fetch_assoc($result_strays)): ?>
+                        <article class="pet" data-item>
+                            <img src="<?php echo htmlspecialchars(asset($row['photo'] ?? '', $root)); ?>" alt="Stray pet" onerror="this.src='https://placehold.co/220x140/f1f5f9/0b5a6b?text=Stray+Photo'">
+                            <h3><?php echo htmlspecialchars($row['pet_name'] ?? 'Unknown Stray'); ?></h3>
+                            <p class="muted"><?php echo htmlspecialchars($row['description'] ?? 'No details'); ?></p>
+                            <p class="tag">Barangay: <?php echo htmlspecialchars($row['barangay'] ?? 'N/A'); ?></p>
+                            <a class="btn btn-soft" href="stray_details.php?id=<?php echo (int)$row['id']; ?>">View details</a>
+                            <div class="row-actions">
+                                <a class="mini" href="edit_stray.php?id=<?php echo (int)$row['id']; ?>">Edit</a>
+                                <a class="mini danger" href="delete_stray.php?id=<?php echo (int)$row['id']; ?>" onclick="return confirm('Delete this report?')">Delete</a>
+                            </div>
+                        </article>
+                    <?php endwhile; else: ?>
+                        <p class="empty">No stray reports available right now.</p>
+                    <?php endif; ?>
                 </div>
                 <button class="arrow" data-dir="1" aria-label="Scroll right">›</button>
             </div>
@@ -362,7 +371,9 @@ document.querySelectorAll('[data-section]').forEach(function (sec) {
 document.getElementById('speciesFilter').addEventListener('change', function (e) {
     var v = e.target.value.toLowerCase();
     document.querySelectorAll('[data-section]').forEach(function (sec) {
-        var t = sec.querySelector('h2').textContent.toLowerCase();
+        var h2 = sec.querySelector('h2');
+        if (!h2) return;
+        var t = h2.textContent.toLowerCase();
         var isSpecies = /dogs|cats|birds/.test(t);
         sec.style.display = (!v || !isSpecies || t.indexOf(v) > -1) ? '' : 'none';
     });

@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -11,6 +12,7 @@ $success = "";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
     $reporter_name = trim($_POST["reporter_name"] ?? "");
     $contact_number = trim($_POST["contact_number"] ?? "");
     $location = trim($_POST["location"] ?? "");
@@ -24,9 +26,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $pet_condition === "" || $description === ""
     ) {
         $error = "Please complete all fields.";
+
     } elseif (!preg_match("/^09[0-9]{9}$/", $contact_number)) {
+
         $error = "Please enter a valid 11-digit mobile number.";
+
     } else {
+
         $stmt = $conn->prepare(
             "INSERT INTO rescue_reports
             (reporter_name, contact_number, location, pet_type,
@@ -57,166 +63,305 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>PAWFINDER - Emergency Rescues</title>
+
     <link rel="stylesheet" href="css/homepage.css">
     <link rel="stylesheet" href="css/rescue.css">
 </head>
+
 <body>
 
-    <div class="top-bar">
-        <div class="role-container">
-            <span class="role-label">Current Role:</span>
-            <select id="roleSwitcher" class="role-select">
-                <option value="admin">Admin</option>
-                <option value="guest" selected>Guest / Public Visitor</option>
-                <option value="rescuer">Local Rescuers</option>
-                <option value="adopter">Adopter</option>
-            </select>
-        </div>
-    </div>
+    <!-- SHARED HEADER -->
+    <?php include 'header.php'; ?>
 
-    <header class="navbar">
-        <div class="brand-section">
-            <img src="image/logo2.jpg" alt="PAWFINDER Logo" class="brand-logo-img">
-            <div>
-                <span class="brand-title">PAWFINDER</span>
-                <span class="brand-subtitle">COMMUNITY PET SYSTEM</span>
-            </div>
-        </div>
-
-        <ul class="nav-links">
-            <li class="nav-item"><a href="homepage.php">Home</a></li>
-            <li class="nav-item"><a href="adopt.php">Adopt Pets</a></li>
-            <li class="nav-item"><a href="rescue.php" class="active">Emergency Rescues</a></li>
-            <li class="nav-item"><a href="health_drives.php">Health Drives</a></li>
-            <li class="nav-item"><a href="contact.php">Contact</a></li>
-        </ul>
-
-        <div class="auth-actions">
-            <button class="btn-login" onclick="location.href='login.php'">Log In</button>
-            <button class="btn-register" onclick="location.href='register.php'">Register</button>
-        </div>
-    </header>
 
     <main class="content-area">
 
+        <!-- HERO BANNER -->
         <div class="hero-banner">
+
             <h1>Every Life Deserves a Chance.</h1>
+
             <p>
                 Help us protect animals in need. Report stray, abandoned,
                 injured, or endangered pets in your community.
             </p>
-            <a href="report.php" class="hero-button">Report a Pet</a>
+
+            <a href="report.php" class="hero-button">
+                Report a Pet
+            </a>
+
         </div>
 
+
+        <!-- EMERGENCY RESCUES INTRODUCTION -->
         <section class="partners-section">
+
             <div class="partners-header">
+
                 <h2>Emergency Pet Rescues</h2>
+
                 <p>
                     PAWFINDER encourages the community to take part in helping
                     animals that need immediate attention. Submit a report so
                     our team can review the situation and coordinate assistance.
                 </p>
+
             </div>
+
         </section>
 
+
+        <!-- RESCUE REPORT FORM -->
         <section class="post-pet-section" id="report-form">
-            <h2 class="section-header-title" style="margin-bottom: 8px;">Report an Animal in Need</h2>
+
+            <h2 class="section-header-title" style="margin-bottom: 8px;">
+                Report an Animal in Need
+            </h2>
+
             <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
                 Provide accurate information about the animal and its location.
             </p>
 
+
+            <!-- SUCCESS MESSAGE -->
             <?php if ($success !== ""): ?>
+
                 <div class="message success">
                     <?= htmlspecialchars($success) ?>
                 </div>
+
             <?php endif; ?>
 
+
+            <!-- ERROR MESSAGE -->
             <?php if ($error !== ""): ?>
+
                 <div class="message error">
                     <?= htmlspecialchars($error) ?>
                 </div>
+
             <?php endif; ?>
 
+
             <form method="POST" action="rescue.php">
+
                 <div class="form-grid">
 
+
+                    <!-- REPORTER NAME -->
                     <div class="form-group">
-                        <label for="reporter_name">Your Full Name</label>
-                        <input type="text" id="reporter_name" name="reporter_name"
-                               placeholder="Enter your full name" required>
+
+                        <label for="reporter_name">
+                            Your Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="reporter_name"
+                            name="reporter_name"
+                            placeholder="Enter your full name"
+                            value="<?= htmlspecialchars($_POST['reporter_name'] ?? '') ?>"
+                            required
+                        >
+
                     </div>
 
+
+                    <!-- CONTACT NUMBER -->
                     <div class="form-group">
-                        <label for="contact_number">Contact Number</label>
-                        <input type="tel" id="contact_number" name="contact_number"
-                               placeholder="09XXXXXXXXX" maxlength="11" required>
+
+                        <label for="contact_number">
+                            Contact Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="contact_number"
+                            name="contact_number"
+                            placeholder="09XXXXXXXXX"
+                            maxlength="11"
+                            value="<?= htmlspecialchars($_POST['contact_number'] ?? '') ?>"
+                            required
+                        >
+
                     </div>
 
+
+                    <!-- RESCUE LOCATION -->
                     <div class="form-group" style="grid-column: 1 / -1;">
-                        <label for="location">Rescue Location</label>
-                        <input type="text" id="location" name="location"
-                               placeholder="Enter the exact location or address" required>
+
+                        <label for="location">
+                            Rescue Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="location"
+                            name="location"
+                            placeholder="Enter the exact location or address"
+                            value="<?= htmlspecialchars($_POST['location'] ?? '') ?>"
+                            required
+                        >
+
                     </div>
 
+
+                    <!-- PET TYPE -->
                     <div class="form-group">
-                        <label for="pet_type">Type of Animal</label>
+
+                        <label for="pet_type">
+                            Type of Animal
+                        </label>
+
                         <select id="pet_type" name="pet_type" required>
+
                             <option value="">Select animal</option>
-                            <option value="Dog">Dog</option>
-                            <option value="Cat">Cat</option>
-                            <option value="Other">Other</option>
+
+                            <option value="Dog"
+                                <?= (($_POST['pet_type'] ?? '') === 'Dog') ? 'selected' : '' ?>>
+                                Dog
+                            </option>
+
+                            <option value="Cat"
+                                <?= (($_POST['pet_type'] ?? '') === 'Cat') ? 'selected' : '' ?>>
+                                Cat
+                            </option>
+
+                            <option value="Other"
+                                <?= (($_POST['pet_type'] ?? '') === 'Other') ? 'selected' : '' ?>>
+                                Other
+                            </option>
+
                         </select>
+
                     </div>
 
+
+                    <!-- PET CONDITION -->
                     <div class="form-group">
-                        <label for="pet_condition">Animal's Condition</label>
+
+                        <label for="pet_condition">
+                            Animal's Condition
+                        </label>
+
                         <select id="pet_condition" name="pet_condition" required>
+
                             <option value="">Select condition</option>
-                            <option value="Injured">Injured</option>
-                            <option value="Abandoned">Abandoned</option>
-                            <option value="Stray">Stray</option>
-                            <option value="Sick">Sick</option>
-                            <option value="In Danger">In Danger</option>
-                            <option value="Other">Other</option>
+
+                            <option value="Injured"
+                                <?= (($_POST['pet_condition'] ?? '') === 'Injured') ? 'selected' : '' ?>>
+                                Injured
+                            </option>
+
+                            <option value="Abandoned"
+                                <?= (($_POST['pet_condition'] ?? '') === 'Abandoned') ? 'selected' : '' ?>>
+                                Abandoned
+                            </option>
+
+                            <option value="Stray"
+                                <?= (($_POST['pet_condition'] ?? '') === 'Stray') ? 'selected' : '' ?>>
+                                Stray
+                            </option>
+
+                            <option value="Sick"
+                                <?= (($_POST['pet_condition'] ?? '') === 'Sick') ? 'selected' : '' ?>>
+                                Sick
+                            </option>
+
+                            <option value="In Danger"
+                                <?= (($_POST['pet_condition'] ?? '') === 'In Danger') ? 'selected' : '' ?>>
+                                In Danger
+                            </option>
+
+                            <option value="Other"
+                                <?= (($_POST['pet_condition'] ?? '') === 'Other') ? 'selected' : '' ?>>
+                                Other
+                            </option>
+
                         </select>
+
                     </div>
 
+
+                    <!-- DESCRIPTION -->
                     <div class="form-group" style="grid-column: 1 / -1;">
-                        <label for="description">Description of the Situation</label>
-                        <textarea id="description" name="description" rows="4"
-                                  placeholder="Describe the animal and explain why it needs help..."
-                                  required></textarea>
+
+                        <label for="description">
+                            Description of the Situation
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="4"
+                            placeholder="Describe the animal and explain why it needs help..."
+                            required
+                        ><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
+
                     </div>
+
 
                 </div>
-                <button type="submit" class="form-submit-btn">Submit Rescue Report</button>
-                <p class="form-note">Please make sure the information you provide is accurate.</p>
+
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit" class="form-submit-btn">
+                    Submit Rescue Report
+                </button>
+
+                <p class="form-note">
+                    Please make sure the information you provide is accurate.
+                </p>
+
             </form>
+
         </section>
 
+
+        <!-- RESCUE REMINDER -->
         <section class="partners-section" style="margin-top: 50px;">
+
             <div class="shelter-cards-grid">
+
                 <div class="shelter-card rescue-reminder">
+
                     <div>
-                        <div class="shelter-name">See an Animal in Danger?</div>
+
+                        <div class="shelter-name">
+                            See an Animal in Danger?
+                        </div>
+
                         <div class="shelter-info">
                             Report its location and condition as soon as possible.
                             If the animal is in immediate danger, contact your local
                             animal welfare or emergency service as well.
                         </div>
+
                     </div>
-                    <a href="contact.php" class="shelter-link">Contact Us →</a>
+
+                    <a href="contact.php" class="shelter-link">
+                        Contact Us →
+                    </a>
+
                 </div>
+
             </div>
+
         </section>
+
 
     </main>
 
 </body>
+
 </html>
 
-<?php $conn->close(); ?>
+<?php
+$conn->close();
+?>

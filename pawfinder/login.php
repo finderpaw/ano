@@ -22,6 +22,39 @@ $pet_id = filter_input(INPUT_GET, 'pet_id', FILTER_VALIDATE_INT) ?: 0;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
+    <style>
+        /* Modern, clean background and custom styling para hindi mukhang AI */
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .login-box {
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 0 15px;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+        .nav-pills-custom .nav-link {
+            font-size: 13px;
+            color: #6c757d;
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 6px 12px;
+            transition: all 0.2s ease;
+        }
+        .form-control {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+    </style>
 </head>
 
 <body>
@@ -31,47 +64,21 @@ $pet_id = filter_input(INPUT_GET, 'pet_id', FILTER_VALIDATE_INT) ?: 0;
         <div class="card-body p-4 p-sm-5">
 
             <div class="text-center mb-4">
-                <div class="d-inline-block p-2 px-3 rounded-pill bg-primary bg-opacity-10 text-primary fw-bold mb-2 small">
-                    🐾 Mabalacat Community Portal
-                </div>
-
-                <h2 class="fw-bold text-dark mb-1">Pawfinder</h2>
-
+                <span class="text-uppercase tracking-wider text-primary fw-bold" style="font-size: 11px; letter-spacing: 1px;">
+                    Mabalacat Community Portal
+                </span>
+                <h3 class="fw-bold text-dark mt-1 mb-1">Pawfinder</h3>
                 <p class="text-muted small mb-0">
                     Pet Adoption, Emergency Rescue & Medical Services
                 </p>
             </div>
 
-            <div class="row text-center mb-4 g-2">
-
-                <div class="col-3">
-                    <div class="p-2 service-badge">
-                        <span class="d-block fs-5">🐶</span>
-                        <span class="text-dark d-block mt-1" style="font-size:11px;font-weight:600;">Adoption</span>
-                    </div>
-                </div>
-
-                <div class="col-3">
-                    <div class="p-2 service-badge">
-                        <span class="d-block fs-5">🚨</span>
-                        <span class="text-dark d-block mt-1" style="font-size:11px;font-weight:600;">Rescue</span>
-                    </div>
-                </div>
-
-                <div class="col-3">
-                    <div class="p-2 service-badge">
-                        <span class="d-block fs-5">🔍</span>
-                        <span class="text-dark d-block mt-1" style="font-size:11px;font-weight:600;">Missing</span>
-                    </div>
-                </div>
-
-                <div class="col-3">
-                    <div class="p-2 service-badge">
-                        <span class="d-block fs-5">💉</span>
-                        <span class="text-dark d-block mt-1" style="font-size:11px;font-weight:600;">Medical</span>
-                    </div>
-                </div>
-
+            <!-- Clean text-based category indicators instead of cartoonish stickers -->
+            <div class="d-flex justify-content-center gap-2 mb-4 text-center">
+                <span class="nav-pills-custom">Adoption</span>
+                <span class="nav-pills-custom">Rescue</span>
+                <span class="nav-pills-custom">Missing</span>
+                <span class="nav-pills-custom">Medical</span>
             </div>
 
             <div class="mb-3">
@@ -128,7 +135,7 @@ $pet_id = filter_input(INPUT_GET, 'pet_id', FILTER_VALIDATE_INT) ?: 0;
                         autocomplete="current-password">
                 </div>
 
-                <button class="btn btn-primary w-100 shadow-sm mb-3" type="submit">
+                <button class="btn btn-primary w-100 shadow-sm mb-3 py-2 fw-semibold" type="submit">
                     Sign In
                 </button>
 
@@ -144,7 +151,7 @@ $pet_id = filter_input(INPUT_GET, 'pet_id', FILTER_VALIDATE_INT) ?: 0;
             <div class="mb-2">
                 <a href="homepage.php"
                     class="btn btn-outline-secondary w-100 py-2 fw-semibold small text-decoration-none rounded-3">
-                    👁️ View as Guest (Public Landing Page)
+                    View as Guest (Public Landing Page)
                 </a>
             </div>
 
@@ -165,7 +172,7 @@ $pet_id = filter_input(INPUT_GET, 'pet_id', FILTER_VALIDATE_INT) ?: 0;
 
             <div class="text-center mt-3 pt-3 border-top">
                 <a href="admin/admin_login.php" class="small text-decoration-none text-secondary">
-                    🔒 Admin? Sign in here
+                    Admin? Sign in here
                 </a>
             </div>
 
@@ -178,7 +185,6 @@ $pet_id = filter_input(INPUT_GET, 'pet_id', FILTER_VALIDATE_INT) ?: 0;
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-body text-center p-4">
-                <div class="fs-1 mb-2">🚫</div>
                 <h5 class="fw-bold text-dark mb-2" id="adminBlockedLabel">Access Denied</h5>
                 <p class="text-muted small mb-4">
                     You don't have authority to sign in here.

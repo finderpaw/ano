@@ -1,59 +1,244 @@
+
 <?php
+
 require_once __DIR__ . '/layout.php';
 
-/* ---------- mark as read (POST) ---------- */
+$username = $_SESSION['username'] ?? '';
+
+/* -----------------------------------------
+   MARK AS READ
+------------------------------------------ */
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // MARK ALL AS READ
     if (isset($_POST['read_all'])) {
-        @mysqli_query($conn, "UPDATE notifications SET is_read = 1");
-    } elseif (isset($_POST['id'])) {
-        $id = (int)$_POST['id'];
-        @mysqli_query($conn, "UPDATE notifications SET is_read = 1 WHERE id = $id");
+
+        $stmt = $conn->prepare("
+            INSERT INTO notification_reads
+                (notification_id, rescuer_username)
+
+            SELECT id, ?
+            FROM notifications
+
+            ON DUPLICATE KEY UPDATE
+                read_at = CURRENT_TIMESTAMP
+        ");
+
+        $stmt->bind_param("s", $username);
+
+        $stmt->execute();
+
+        $stmt->close();
+
     }
-    header("Location: notification.php" . (isset($_GET['type']) ? '?type=' . urlencode($_GET['type']) : ''));
+
+    // MARK ONE AS READ
+    elseif (isset($_POST['id'])) {
+
+        $id = (int)$_POST['id'];
+
+        $stmt = $conn->prepare("
+            INSERT INTO notification_reads
+                (notification_id, rescuer_username)
+
+            SELECT id, ?
+            FROM notifications
+            WHERE id = ?
+
+            ON DUPLICATE KEY UPDATE
+                read_at = CURRENT_TIMESTAMP
+        ");
+
+        $stmt->bind_param("si", $username, $id);
+
+        $stmt->execute();
+
+        $stmt->close();
+
+    }
+
+    header("Location: notifications.php");
+
     exit();
 }
 
-$types = ['all' => 'All', 'adopter' => 'Adopter messages', 'missing' => 'Missing pets'];
-$type  = isset($types[$_GET['type'] ?? '']) ? $_GET['type'] : 'all';
-$where = $type === 'all' ? '' : "WHERE type = '" . mysqli_real_escape_string($conn, $type) . "'";
-$res   = @mysqli_query($conn, "SELECT * FROM notifications $where ORDER BY is_read ASC, created_at DESC");
 
-rescuer_head('notifications', 'Notifications');
-rescuer_top('Notifications', 'Messages from adopters and missing pet alerts');
+/* -----------------------------------------
+   FETCH NOTIFICATIONS
+------------------------------------------ */
+
+$sql = "
+
+    SELECT
+
+        n.id,
+        n.title,
+        n.message,
+        n.audience,
+        n.created_at,
+        n.request_id,
+
+        CASE
+            WHEN nr.id IS NULL THEN 0
+            ELSE 1
+        END AS is_read
+
+    FROM notifications n
+
+    LEFT JOIN notification_reads nr
+
+        ON nr.notification_id = n.id
+
+        AND nr.rescuer_username = ?
+
+    ORDER BY is_read ASC, n.created_at DESC
+
+";
+
+
+$stmt = $conn->prepare($sql);
+
+$stmt->bind_param("s", $username);
+
+$stmt->execute();
+
+$res = $stmt->get_result();
+
+
+/* -----------------------------------------
+   PAGE HEADER
+------------------------------------------ */
+
+rescuer_head(
+    'notifications',
+    'Notifications'
+);
+
+rescuer_top(
+    'Notifications',
+    'Updates and announcements from Pawfinder'
+);
+
 ?>
-        <section class="panel">
-            <div class="panel-head">
-                <h2>Inbox</h2>
-                <div class="panel-tools">
-                    <form method="post"><button class="btn btn-soft" name="read_all" value="1">Mark all as read</button></form>
+
+<section class="panel">
+
+    <div class="panel-head">
+
+        <h2>Inbox</h2>
+
+        <div class="panel-tools">
+
+            <form method="POST">
+
+                <button
+                    class="btn btn-soft"
+                    type="submit"
+                    name="read_all"
+                    value="1"
+                >
+                    Mark all as read
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <?php if ($res && $res->num_rows > 0): ?>
+
+        <?php while ($n = $res->fetch_assoc()): ?>
+
+            <div class="msg <?php echo $n['is_read'] ? '' : 'unread'; ?>">
+
+                <div class="body">
+
+                    <div class="meta">
+
+                        <b>
+                            <?php echo e($n['title']); ?>
+                        </b>
+
+                        <span class="pill <?php echo $n['audience'] === 'all' ? 'green' : 'amber'; ?>">
+
+                            <?php echo e(ucfirst($n['audience'])); ?>
+
+                        </span>
+
+                        <time>
+                            <?php echo e($n['created_at']); ?>
+                        </time>
+
+                    </div>
+
+
+                    <p>
+                        <?php echo nl2br(e($n['message'])); ?>
+                    </p>
+
+
+                    <?php if (!empty($n['request_id'])): ?>
+
+                        <small>
+                            Related Request ID:
+                            <?php echo (int)$n['request_id']; ?>
+                        </small>
+
+                    <?php endif; ?>
+
+
+                    <?php if (!$n['is_read']): ?>
+
+                        <form method="POST" style="margin-top: 8px;">
+
+                            <input
+                                type="hidden"
+                                name="id"
+                                value="<?php echo (int)$n['id']; ?>"
+                            >
+
+                            <button
+                                type="submit"
+                                class="mini"
+                                style="border:0; cursor:pointer;"
+                            >
+                                Mark as read
+                            </button>
+
+                        </form>
+
+                    <?php else: ?>
+
+                        <small style="color: #1f7a4d;">
+                            ✓ Read
+                        </small>
+
+                    <?php endif; ?>
+
                 </div>
-            </div>
-            <div class="tabs">
-                <?php foreach ($types as $k => $lbl): ?>
-                    <a href="?type=<?php echo $k; ?>" class="<?php echo $type === $k ? 'on' : ''; ?>"><?php echo $lbl; ?></a>
-                <?php endforeach; ?>
+
             </div>
 
-            <?php if ($res && mysqli_num_rows($res) > 0): while ($n = mysqli_fetch_assoc($res)):
-                $missing = $n['type'] === 'missing'; ?>
-                <div class="msg <?php echo $n['is_read'] ? '' : 'unread'; ?>">
-                    <div class="body">
-                        <div class="meta">
-                            <b><?php echo e($n['sender_name']); ?></b>
-                            <span class="pill <?php echo $missing ? 'amber' : 'green'; ?>"><?php echo $missing ? 'Missing pet' : 'Adopter'; ?></span>
-                            <time><?php echo e($n['created_at']); ?></time>
-                        </div>
-                        <p><?php echo e($n['message']); ?></p>
-                        <?php if (!$n['is_read']): ?>
-                            <form method="post" style="margin-top:6px">
-                                <input type="hidden" name="id" value="<?php echo (int)$n['id']; ?>">
-                                <button class="mini" style="border:0;cursor:pointer">Mark as read</button>
-                            </form>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            <?php endwhile; else: ?>
-                <p class="empty">No messages here yet. New adopter messages and missing-pet alerts will show up in this list.</p>
-            <?php endif; ?>
-        </section>
-<?php rescuer_foot(); ?>
+        <?php endwhile; ?>
+
+    <?php else: ?>
+
+        <p class="empty">
+            No notifications available yet.
+            New Pawfinder announcements and updates will appear here.
+        </p>
+
+    <?php endif; ?>
+
+</section>
+
+<?php
+
+$stmt->close();
+
+rescuer_foot();
+
+?>

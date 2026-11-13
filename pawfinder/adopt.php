@@ -112,40 +112,7 @@ if ($gender === 'all') {
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="role-container">
-            <span class="role-label">Current Role:</span>
-            <select id="roleSwitcher" class="role-select">
-                <option value="admin">Admin</option>
-                <option value="guest" selected>Guest / Public Visitor</option>
-                <option value="rescuer">Local Rescuers</option>
-                <option value="adopter">Adopter</option>
-            </select>
-        </div>
-    </div>
-
-    <header class="navbar">
-        <div class="brand-section" onclick="location.href='homepage.php'">
-            <img src="image/logo2.jpg" alt="PAWFINDER Logo" class="brand-logo-img">
-            <div>
-                <span class="brand-title">PAWFINDER</span>
-                <span class="brand-subtitle">COMMUNITY PET SYSTEM</span>
-            </div>
-        </div>
-
-        <ul class="nav-links">
-            <li class="nav-item"><a href="homepage.php">Home</a></li>
-            <li class="nav-item"><a href="adopt.php" class="active">Adopt Pets</a></li>
-            <li class="nav-item"><a href="rescue.php">Emergency Rescues</a></li>
-            <li class="nav-item"><a href="health_drives.php">Health Drives</a></li>
-            <li class="nav-item"><a href="contact.php">Contact</a></li>
-        </ul>
-
-         <div class="auth-actions">
-            <button class="btn-login" onclick="location.href='login.php'">Log In</button>
-            <button class="btn-register" onclick="location.href='register.php'">Register</button>
-        </div>
-    </header>
+    <?php include 'header.php'; ?>
 
     <main class="content-area">
 

@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -33,7 +34,7 @@ if ($result) {
 }
 
 function e($value) {
-    return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
+    return htmlspecialchars($value ?? '', ENT_QUOTES, "UTF-8");
 }
 ?>
 
@@ -49,26 +50,6 @@ function e($value) {
     <link rel="stylesheet" href="css/homepage.css">
 
 <style>
-    .navbar {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .nav-links {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 25px;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        white-space: nowrap;
-    }
 
     .health-container {
         max-width: 1200px;
@@ -213,10 +194,25 @@ function e($value) {
         white-space: nowrap;
     }
 
-    .sched-status.upcoming  { background: #ccfbf1; color: #0f766e; }
-    .sched-status.ongoing   { background: #dbeafe; color: #1d4ed8; }
-    .sched-status.completed { background: #e2e8f0; color: #475569; }
-    .sched-status.cancelled { background: #fee2e2; color: #991b1b; }
+    .sched-status.upcoming {
+        background: #ccfbf1;
+        color: #0f766e;
+    }
+
+    .sched-status.ongoing {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .sched-status.completed {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .sched-status.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
 
     .health-empty {
         background: white;
@@ -245,86 +241,32 @@ function e($value) {
         .health-header h1 {
             font-size: 24px;
         }
-
-        .nav-links {
-            position: static;
-            transform: none;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
     }
+
 </style>
 
 </head>
 
 <body>
 
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <div class="role-container">
-            <span class="role-label">Current Role:</span>
-            <select id="roleSwitcher" class="role-select">
-                <option value="admin">Admin</option>
-                <option value="guest" selected>Guest / Public Visitor</option>
-                <option value="rescuer">Local Rescuers</option>
-                <option value="adopter">Adopter</option>
-            </select>
-        </div>
-    </div>
+    <!-- SHARED HEADER -->
+    <?php include 'header.php'; ?>
 
-    <!-- NAVBAR -->
-    <header class="navbar">
-
-        <div class="brand-section">
-            <img src="image/logo2.jpg"
-                 alt="PAWFINDER Logo"
-                 class="brand-logo-img">
-
-            <div>
-                <span class="brand-title">PAWFINDER</span>
-                <span class="brand-subtitle">COMMUNITY PET SYSTEM</span>
-            </div>
-        </div>
-
-        <ul class="nav-links">
-            <li class="nav-item">
-                <a href="homepage.php">Home</a>
-            </li>
-
-            <li class="nav-item">
-                <a href="adopt.php">Adopt Pets</a>
-            </li>
-
-            <li class="nav-item">
-                <a href="rescue.php">Emergency Rescues</a>
-            </li>
-
-            <li class="nav-item">
-                <a href="health_drives.php">Health Drives</a>
-            </li>
-
-            <li class="nav-item">
-                <a href="contact.php">Contact</a>
-            </li>
-        </ul>
-
-        <div class="auth-actions">
-            <button class="btn-login" onclick="location.href='login.php'">Log In</button>
-            <button class="btn-register" onclick="location.href='register.php'">Register</button>
-        </div>
-    </header>
 
     <!-- MAIN CONTENT -->
     <main class="health-container">
 
         <section class="health-header">
+
             <h1>Community Pet Health Drives</h1>
 
             <p>
                 Providing accessible veterinary care and healthier lives
                 for every pet in our community.
             </p>
+
         </section>
+
 
         <!-- HEALTH DRIVE LISTINGS -->
         <section>
@@ -336,7 +278,8 @@ function e($value) {
             <?php if (empty($healthDrives)): ?>
 
                 <div class="health-empty">
-                    No health drives are scheduled right now. Please check back soon.
+                    No health drives are scheduled right now.
+                    Please check back soon.
                 </div>
 
             <?php else: ?>
@@ -394,6 +337,7 @@ function e($value) {
 
         </section>
 
+
         <!-- FREE MEDICINE & VACCINATION SCHEDULE -->
         <section class="schedule-section" id="schedule">
 
@@ -410,7 +354,9 @@ function e($value) {
             <?php else: ?>
 
                 <div class="schedule-wrap">
+
                     <table class="schedule-table">
+
                         <thead>
                             <tr>
                                 <th>Date &amp; Time</th>
@@ -419,27 +365,47 @@ function e($value) {
                                 <th>Status</th>
                             </tr>
                         </thead>
+
                         <tbody>
+
                             <?php foreach ($healthDrives as $drive): ?>
+
                                 <tr>
+
                                     <td>
-                                        <?php echo e(date('M d, Y', strtotime($drive['date']))); ?><br>
+                                        <?php echo e(date('M d, Y', strtotime($drive['date']))); ?>
+                                        <br>
                                         <?php echo e($drive['time']); ?>
                                     </td>
-                                    <td><?php echo e($drive['location']); ?></td>
+
                                     <td>
-                                        <div class="svc-name"><?php echo e($drive['name']); ?></div>
-                                        <div class="svc-desc"><?php echo e($drive['description']); ?></div>
+                                        <?php echo e($drive['location']); ?>
                                     </td>
+
+                                    <td>
+                                        <div class="svc-name">
+                                            <?php echo e($drive['name']); ?>
+                                        </div>
+
+                                        <div class="svc-desc">
+                                            <?php echo e($drive['description']); ?>
+                                        </div>
+                                    </td>
+
                                     <td>
                                         <span class="sched-status <?php echo e(strtolower($drive['status'])); ?>">
                                             <?php echo e($drive['status']); ?>
                                         </span>
                                     </td>
+
                                 </tr>
+
                             <?php endforeach; ?>
+
                         </tbody>
+
                     </table>
+
                 </div>
 
             <?php endif; ?>
@@ -449,6 +415,7 @@ function e($value) {
     </main>
 
 </body>
+
 </html>
 
 <?php
