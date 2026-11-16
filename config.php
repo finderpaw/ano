@@ -1,0 +1,26 @@
+    <?php
+
+    $host = "localhost";
+    $username = "root";
+    $password = "";
+    $database = "pawfinder_db";
+
+    $conn = new mysqli(
+        $host,
+        $username,
+        $password,
+        $database
+    );
+
+    if ($conn->connect_error) {
+        error_log("Database connection failed: " . $conn->connect_error);
+        die("Unable to connect to the database. Please try again later.");
+    }
+
+    $conn->set_charset("utf8mb4");
+
+
+    define('MAIL_USER', 'aggarcia0807@gmail.com');
+    define('MAIL_APP_PASS', 'exafpmevgucqabka');  // walang spaces
+    define('ADMIN_NOTIFY_EMAIL', 'aggarcia0807@gmail.com');
+    ?>

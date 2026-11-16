@@ -1,0 +1,88 @@
+/* =========================================
+   PAWFINDER - GLOBAL THEME & DARK MODE STYLES
+   ========================================= */
+
+/* Base Dark Mode variables and transitions */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Global Dark Mode background overrides for main pages */
+body.dark-mode {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+/* Navbar Dark Mode */
+body.dark-mode .navbar {
+    background-color: #1e293b !important;
+    border-bottom-color: #334155 !important;
+}
+
+body.dark-mode .nav-links a {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .nav-links a:hover,
+body.dark-mode .nav-links a.active {
+    color: #2dd4bf !important;
+}
+
+body.dark-mode .brand-title {
+    color: #2dd4bf !important;
+}
+
+/* Footer Dark Mode */
+body.dark-mode footer {
+    background-color: #090d16 !important;
+    color: #94a3b8 !important;
+    border-top: 1px solid #334155 !important;
+}
+
+/* =========================================
+   ULTIMATE DARK MODE OVERRIDE PARA SA RESCUE AT CONTACT BOXES
+   ========================================= */
+html.dark-mode .post-pet-section,
+body.dark-mode .post-pet-section,
+html.dark-mode .report-section,
+body.dark-mode .report-section,
+html.dark-mode .partners-section,
+body.dark-mode .partners-section,
+html.dark-mode .rescue-reminder,
+body.dark-mode .rescue-reminder {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+html.dark-mode .post-pet-section h2,
+body.dark-mode .post-pet-section h2,
+html.dark-mode .report-section h2,
+body.dark-mode .report-section h2,
+html.dark-mode .section-header-title,
+body.dark-mode .section-header-title,
+html.dark-mode .report-heading h2,
+body.dark-mode .report-heading h2,
+html.dark-mode .partners-header h2,
+body.dark-mode .partners-header h2,
+html.dark-mode .rescue-reminder .shelter-name,
+body.dark-mode .rescue-reminder .shelter-name {
+    color: #f8fafc !important;
+}
+
+html.dark-mode .post-pet-section p,
+body.dark-mode .post-pet-section p,
+html.dark-mode .report-section p,
+body.dark-mode .report-section p,
+html.dark-mode .report-heading p,
+body.dark-mode .report-heading p,
+html.dark-mode .form-subtitle-desc,
+body.dark-mode .form-subtitle-desc,
+html.dark-mode .partners-header p,
+body.dark-mode .partners-header p,
+html.dark-mode .rescue-reminder .shelter-info,
+body.dark-mode .rescue-reminder .shelter-info,
+html.dark-mode .form-note,
+body.dark-mode .form-note {
+    color: #94a3b8 !important;
+}
