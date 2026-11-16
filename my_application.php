@@ -1,9 +1,8 @@
 <?php
-<<<<<<< HEAD
 // my_application.php - the user sees the result of their own adoption application
-=======
+
 // my_application.php - nakikita ng user ang resulta ng sarili niyang adoption application
->>>>>>> 4582cf80cab0ccaa3d6f2749402c2452f6a3e01c
+
 session_start();
 require_once 'config.php';
 
@@ -22,11 +21,7 @@ if ($reqId <= 0) {
     exit();
 }
 
-<<<<<<< HEAD
-/* The user can only see their own request */
-=======
-/* Sariling request lang ng user ang makikita */
->>>>>>> 4582cf80cab0ccaa3d6f2749402c2452f6a3e01c
+
 $st = $conn->prepare(
     "SELECT r.id, r.status, r.created_at, r.pet_id,
             p.pet_name, p.pet_species, p.breed, p.pet_photo,
@@ -46,11 +41,7 @@ if (!$req) {
     exit();
 }
 
-<<<<<<< HEAD
-/* The answers they submitted (no red flags and no ID) */
-=======
-/* Mga isinumite niyang sagot (walang red flags at walang ID) */
->>>>>>> 4582cf80cab0ccaa3d6f2749402c2452f6a3e01c
+
 $app = null;
 try {
     $st = $conn->prepare("SELECT answers, id_type, signature_name, agreed_at FROM adoption_applications WHERE request_id = ? AND user_id = ? ORDER BY id DESC LIMIT 1");
@@ -113,17 +104,16 @@ $petPhoto = (string)($req['pet_photo'] ?? '');
         details.ma-more[open] summary{margin-bottom:14px}
         .ma-sec{margin-bottom:18px}
     </style>
-<<<<<<< HEAD
+
     <!-- Dark mode overrides (must come after the styles above) -->
     <link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
     <!-- Applies the saved dark mode (must be right after the opening body tag) -->
     <script src="js/darkmode.js"></script>
-=======
+
 </head>
 <body>
->>>>>>> 4582cf80cab0ccaa3d6f2749402c2452f6a3e01c
 
     <?php include 'header.php'; ?>
 
@@ -145,11 +135,8 @@ $petPhoto = (string)($req['pet_photo'] ?? '');
                 </div>
             </div>
 
-<<<<<<< HEAD
-            <!-- RESULT -->
-=======
-            <!-- RESULTA -->
->>>>>>> 4582cf80cab0ccaa3d6f2749402c2452f6a3e01c
+       
+   
             <?php if ($kind === 'approved'): ?>
                 <div class="ma-result approved" role="status">
                     <div class="ico" aria-hidden="true">&#10003;</div>
@@ -184,11 +171,8 @@ $petPhoto = (string)($req['pet_photo'] ?? '');
                 </div>
             <?php endif; ?>
 
-<<<<<<< HEAD
-            <!-- THEIR SUBMITTED ANSWERS -->
-=======
-            <!-- SINUMITE NIYANG SAGOT -->
->>>>>>> 4582cf80cab0ccaa3d6f2749402c2452f6a3e01c
+         
+ 
             <?php if ($app && $sections): ?>
                 <div class="ma-card">
                     <details class="ma-more">
